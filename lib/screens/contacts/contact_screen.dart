@@ -1,6 +1,7 @@
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:telephony/telephony.dart';
 
 import '../../assets/theme.dart';
 import '../../assets/widgets/customalert.dart';
@@ -159,12 +160,25 @@ class _AllContactsPageState extends State<AllContactsPage> {
   void _addContact(EmergencyContact newContact) async {
     int result = await _databaseHelper.insertContact(newContact);
     if (result != 0) {
+      sendNotification(newContact.number);
       // Fluttertoast.showToast(msg: "Contact added successfully");
     } else {
       // Fluttertoast.showToast(msg: "Failed to add contact");
     }
     Navigator.of(context).pop(true);
   }
+}
+
+void sendNotification(String phoneNumber) {
+  const String message =
+      "You have been added as an emergency contact in my SheRo. I rely on you for quick help in case of emergencies. Thank you!";
+
+  Telephony.backgroundInstance
+      .sendSms(to: phoneNumber, message: message)
+      .then((value) {
+    print("contact added msg sent");
+    // Optionally handle the success or failure of SMS sending
+  });
 }
 
 void handleInvalidPermission(
