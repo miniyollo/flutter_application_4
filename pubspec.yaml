@@ -57,6 +57,7 @@ dependencies:
   vibration: ^1.8.4
   flutter_localization: ^0.2.0
   intl: ^0.18.1
+  shared_preferences: ^2.2.3
 
 dev_dependencies:
   flutter_test:

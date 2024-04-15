@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import '../../assets/widgets/customtexticoncard.dart';
 
 class SafePlacesPage extends StatefulWidget {
   @override
@@ -9,17 +8,18 @@ class SafePlacesPage extends StatefulWidget {
 }
 
 class _SafePlacesPageState extends State<SafePlacesPage> {
-  final List<Map<String, dynamic>> safePlaces = [
-    {'name': 'Police Station', 'icon': Icons.local_police},
-    {'name': 'Hospital', 'icon': Icons.local_hospital},
-    {'name': 'Fire Station', 'icon': Icons.local_fire_department},
-    {'name': 'Pharmacy', 'icon': Icons.local_pharmacy},
-  ];
-
+  List<Map<String, dynamic>> safePlaces = [];
   final TextEditingController _controller = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    _loadPlaces();
+  }
+
   Future<void> _launchMapsSearch(String query) async {
-    final Uri url = Uri.parse("https://www.google.com/maps/search/?api=1&query=$query");
+    final Uri url =
+        Uri.parse("https://www.google.com/maps/search/?api=1&query=$query");
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     } else {
@@ -27,10 +27,25 @@ class _SafePlacesPageState extends State<SafePlacesPage> {
     }
   }
 
-  void _addLocation() {
+  Future<void> _loadPlaces() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final List<String>? loadedPlaces = prefs.getStringList('savedPlaces');
+    if (loadedPlaces != null) {
+      setState(() {
+        safePlaces = loadedPlaces
+            .map((name) => {'name': name, 'icon': Icons.place})
+            .toList();
+      });
+    }
+  }
+
+  Future<void> _addLocation() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     if (_controller.text.isNotEmpty) {
       setState(() {
         safePlaces.add({'name': _controller.text, 'icon': Icons.place});
+        prefs.setStringList('savedPlaces',
+            safePlaces.map((place) => place['name'] as String).toList());
         _controller.clear();
       });
     }
@@ -60,9 +75,9 @@ class _SafePlacesPageState extends State<SafePlacesPage> {
               itemCount: safePlaces.length,
               itemBuilder: (context, index) {
                 final place = safePlaces[index];
-                return TextIconCard(
-                  text: place['name'],
-                  icon: place['icon'],
+                return ListTile(
+                  title: Text(place['name']),
+                  leading: Icon(place['icon']),
                   onTap: () => _launchMapsSearch('${place['name']} near me'),
                 );
               },
