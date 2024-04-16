@@ -58,6 +58,7 @@ dependencies:
   flutter_localization: ^0.2.0
   intl: ^0.18.1
   shared_preferences: ^2.2.3
+  firebase_core: ^2.29.0
 
 dev_dependencies:
   flutter_test:

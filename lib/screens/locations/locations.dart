@@ -8,7 +8,8 @@ class SafePlacesPage extends StatefulWidget {
 }
 
 class _SafePlacesPageState extends State<SafePlacesPage> {
-  List<Map<String, dynamic>> safePlaces = [];
+  List<Map<String, Object>> safePlaces = [];
+
   final TextEditingController _controller = TextEditingController();
 
   @override
@@ -39,11 +40,14 @@ class _SafePlacesPageState extends State<SafePlacesPage> {
     }
   }
 
-  Future<void> _addLocation() async {
+  void _addLocation() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     if (_controller.text.isNotEmpty) {
       setState(() {
-        safePlaces.add({'name': _controller.text, 'icon': Icons.place});
+        safePlaces.add({
+          'name': _controller.text as Object,
+          'icon': Icons.place as Object
+        });
         prefs.setStringList('savedPlaces',
             safePlaces.map((place) => place['name'] as String).toList());
         _controller.clear();
@@ -76,8 +80,8 @@ class _SafePlacesPageState extends State<SafePlacesPage> {
               itemBuilder: (context, index) {
                 final place = safePlaces[index];
                 return ListTile(
-                  title: Text(place['name']),
-                  leading: Icon(place['icon']),
+                  title: Text(place['name'] as String),
+                  leading: Icon(place['icon'] as IconData?),
                   onTap: () => _launchMapsSearch('${place['name']} near me'),
                 );
               },
