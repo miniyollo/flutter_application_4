@@ -39,6 +39,14 @@ class _SafePlacesPageState extends State<SafePlacesPage> {
       });
     }
   }
+void _deleteLocation(int index) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  setState(() {
+    safePlaces.removeAt(index);
+    prefs.setStringList('savedPlaces',
+        safePlaces.map((place) => place['name'] as String).toList());
+  });
+}
 
   void _addLocation() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -55,6 +63,7 @@ class _SafePlacesPageState extends State<SafePlacesPage> {
     }
   }
 
+  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,6 +92,10 @@ class _SafePlacesPageState extends State<SafePlacesPage> {
                   title: Text(place['name'] as String),
                   leading: Icon(place['icon'] as IconData?),
                   onTap: () => _launchMapsSearch('${place['name']} near me'),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () => _deleteLocation(index),
+                  ),
                 );
               },
             ),
